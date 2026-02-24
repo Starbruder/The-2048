@@ -60,6 +60,18 @@ func spawn_tile():
 		new_tile.position = get_tile_pos(x, y)
 		add_child(new_tile)
 		grid[x][y] = new_tile
+		
+		# NEU: Start-Skalierung auf 0 setzen für "Pop-In" Effekt
+		new_tile.scale = Vector2.ZERO
+		var target_scale = Vector2(cell_size / 160.0, cell_size / 160.0)
+		
+		new_tile.position = get_tile_pos(x, y)
+		add_child(new_tile)
+		grid[x][y] = new_tile
+		
+		# Animation: Erscheinen (Aufblähen)
+		var tween = create_tween()
+		tween.tween_property(new_tile, "scale", target_scale, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _input(event):
 	if event.is_action_pressed("ui_left"):
@@ -106,18 +118,33 @@ func shift_tile(tile, x, y, direction):
 		next_y = curr_y + int(direction.y)
 		has_moved = true
 
+	# Animation für das Gleiten (Standard-Bewegung)
+	if has_moved:
+		var tween = create_tween()
+		# Wir nutzen .set_trans(Tween.TRANS_QUAD), damit es sich "natürlich" anfühlt
+		tween.tween_property(tile, "position", get_tile_pos(curr_x, curr_y), 0.1)
+
+	# Prüfen auf Verschmelzung
 	if next_x >= 0 and next_x < grid_size and next_y >= 0 and next_y < grid_size:
 		var target_tile = grid[next_x][next_y]
 		if target_tile and target_tile.value == tile.value and not target_tile in merged_tiles:
 			target_tile.value *= 2
-			target_tile.update_display()
+			
+			# Animation für das Verschmelzen (Zusammenziehen)
+			var merge_tween = create_tween()
+			# Erst zum Ziel gleiten, dann das alte Tile löschen
+			merge_tween.tween_property(tile, "position", get_tile_pos(next_x, next_y), 0.1)
+			merge_tween.tween_callback(tile.queue_free)
+			merge_tween.tween_callback(target_tile.update_display)
+			
+			# Bonus: Kleiner "Bounce" Effekt für das Ziel-Tile
+			var bounce_tween = create_tween()
+			var original_scale = target_tile.scale
+			bounce_tween.tween_property(target_tile, "scale", original_scale * 1.2, 0.05)
+			bounce_tween.tween_property(target_tile, "scale", original_scale, 0.05)
+			
 			merged_tiles.append(target_tile)
 			grid[curr_x][curr_y] = null
-			tile.queue_free()
 			return true
-
-	if has_moved:
-		tile.position = get_tile_pos(curr_x, curr_y)
-		return true
-		
-	return false
+			
+	return has_moved
