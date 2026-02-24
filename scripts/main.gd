@@ -3,7 +3,7 @@ extends Node2D
 var tile_scene = preload("res://scenes/tile.tscn")
 
 # --- Einstellungen ---
-var grid_size = 5
+var grid_size = 4
 var padding = 10
 var margin = 40
 var use_animations = true # Turbo-Modus an/aus
