@@ -14,6 +14,8 @@ var screen_width: float
 var grid = []
 var merged_tiles = []
 var is_moving = false
+var touch_start_pos = Vector2.ZERO
+var min_swipe_distance = 50
 
 func _ready():
 	screen_width = ProjectSettings.get_setting("display/window/size/viewport_width")
@@ -61,6 +63,7 @@ func spawn_tile():
 func _input(event):
 	if is_moving: return
 	
+	# 1. Tastensteuerung (PC) bleibt erhalten
 	var direction = Vector2.ZERO
 	if event.is_action_pressed("ui_left"): direction = Vector2.LEFT
 	elif event.is_action_pressed("ui_right"): direction = Vector2.RIGHT
@@ -69,6 +72,41 @@ func _input(event):
 	
 	if direction != Vector2.ZERO:
 		move_all_tiles(direction)
+		return
+
+	# 2. Touch & Maus-Swipe Logik
+	if event is InputEventMouseButton or event is InputEventScreenTouch:
+		if event.pressed:
+			# Finger/Maus wurde gerade aufgesetzt
+			touch_start_pos = event.position
+		else:
+			# Finger/Maus wurde losgelassen -> Differenz berechnen
+			var swipe_vector = event.position - touch_start_pos
+			
+			# Nur reagieren, wenn die Bewegung weit genug war (gegen Zittern)
+			if swipe_vector.length() > min_swipe_distance:
+				analyze_swipe(swipe_vector)
+
+# Hilfsfunktion, um den Winkel des Swipes in eine Richtung zu übersetzen
+func analyze_swipe(swipe: Vector2):
+	var swipe_direction = Vector2.ZERO
+	
+	# Wir prüfen, ob die Bewegung eher horizontal oder vertikal war
+	if abs(swipe.x) > abs(swipe.y):
+		# Horizontal
+		if swipe.x > 0:
+			swipe_direction = Vector2.RIGHT
+		else:
+			swipe_direction = Vector2.LEFT
+	else:
+		# Vertikal
+		if swipe.y > 0:
+			swipe_direction = Vector2.DOWN
+		else:
+			swipe_direction = Vector2.UP
+			
+	if swipe_direction != Vector2.ZERO:
+		move_all_tiles(swipe_direction)
 
 func move_all_tiles(direction: Vector2):
 	var moved = false
