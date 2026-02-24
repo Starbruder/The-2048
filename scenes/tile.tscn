@@ -1,7 +1,19 @@
 [gd_scene format=3 uid="uid://daxmiorpf8vv3"]
 
+[ext_resource type="Script" uid="uid://ixancf0joj7c" path="res://scenes/tile.gd" id="1_3dk36"]
+
 [node name="Tile" type="Node2D" unique_id=1291646881]
+script = ExtResource("1_3dk36")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1198452553]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 160.0
+offset_bottom = 160.0
+
+[node name="Label" type="Label" parent="." unique_id=1465209028]
+modulate = Color(1, 0, 1, 1)
+offset_right = 160.0
+offset_bottom = 160.0
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
