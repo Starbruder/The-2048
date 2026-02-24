@@ -28,12 +28,40 @@ func _ready():
 		grid.append([])
 		for y in range(grid_size):
 			grid[x].append(null)
+			
+	# NEU: Erst den Hintergrund zeichnen, dann die Kacheln spawnen
+	setup_background_grid()
 	
 	spawn_tile()
 	spawn_tile()
 
 func get_tile_pos(x: int, y: int) -> Vector2:
 	return Vector2(x * (cell_size + padding) + margin, y * (cell_size + padding) + 300)
+	
+func setup_background_grid():
+	# Wir erstellen ein großes Rechteck als Spielfeld-Hintergrund
+	var board_bg = ColorRect.new()
+	
+	# Größe berechnen: (Anzahl Zellen * (Größe + Padding)) + Padding für den äußeren Rand
+	var board_size = grid_size * (cell_size + padding) + padding
+	board_bg.size = Vector2(board_size, board_size)
+	
+	# Position: Wir nutzen die gleiche Logik wie get_tile_pos, aber etwas versetzt
+	# damit das Gitter schön zentriert unter den Tiles liegt
+	board_bg.position = Vector2(margin - padding, 300 - padding)
+	board_bg.color = Color("908474") # Ein etwas dunkleres Braun für den Rahmen
+	board_bg.z_index = -2 # Ganz nach hinten
+	add_child(board_bg)
+	
+	# Jetzt zeichnen wir die leeren Felder (deine Farbe c5b4a0)
+	for x in range(grid_size):
+		for y in range(grid_size):
+			var empty_slot = ColorRect.new()
+			empty_slot.size = Vector2(cell_size, cell_size)
+			empty_slot.position = get_tile_pos(x, y)
+			empty_slot.color = Color("ded5d0") # Deine gewünschte Farbe
+			empty_slot.z_index = -1 # Hinter die Tiles, aber vor den board_bg
+			add_child(empty_slot)
 
 func spawn_tile():
 	var empty_cells = []

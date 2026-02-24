@@ -10,7 +10,7 @@ offset_right = 160.0
 offset_bottom = 160.0
 
 [node name="Label" type="Label" parent="." unique_id=1465209028]
-modulate = Color(1, 0, 1, 1)
+modulate = Color(0, 0, 0, 1)
 offset_right = 160.0
 offset_bottom = 160.0
 text = "2"
