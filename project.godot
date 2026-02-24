@@ -14,7 +14,7 @@ config/name="The-2048"
 run/main_scene="uid://cnm0lmar6n2bt"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/show_image=false
-config/icon="res://icon.svg"
+config/icon="uid://co63jat2i7ggb"
 
 [display]
 
