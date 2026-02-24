@@ -3,6 +3,7 @@ extends Node2D
 var tile_scene = preload("res://scenes/tile.tscn")
 
 # --- Einstellungen ---
+var new_tile_value = 2.0
 var grid_size = 4
 var padding = 10
 var margin = 40
@@ -47,7 +48,7 @@ func spawn_tile():
 		var y = int(random_pos.y)
 		
 		var new_tile = tile_scene.instantiate()
-		new_tile.value = 2.0 
+		new_tile.value = new_tile_value
 		var target_scale = Vector2(cell_size / 160.0, cell_size / 160.0)
 		new_tile.position = get_tile_pos(x, y)
 		add_child(new_tile)
