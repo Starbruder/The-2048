@@ -1,2 +1,2 @@
 # The-2048
-A 2048 game
+An infinite 2048 game
