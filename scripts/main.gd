@@ -107,18 +107,26 @@ func _input(event):
 		move_all_tiles(direction)
 		return
 
-	# 2. Touch & Maus-Swipe Logik
-	if event is InputEventMouseButton or event is InputEventScreenTouch:
+	# 2. Touch & Maus-Swipe Logik (Gefixed!)
+	# Wir prüfen, ob es ein Touch ist ODER explizit die LINKE Maustaste
+	var is_valid_swipe = (event is InputEventScreenTouch) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT)
+	
+	if is_valid_swipe:
 		if event.pressed:
 			# Finger/Maus wurde gerade aufgesetzt
 			touch_start_pos = event.position
 		else:
 			# Finger/Maus wurde losgelassen -> Differenz berechnen
-			var swipe_vector = event.position - touch_start_pos
-			
-			# Nur reagieren, wenn die Bewegung weit genug war (gegen Zittern)
-			if swipe_vector.length() > min_swipe_distance:
-				analyze_swipe(swipe_vector)
+			# Sicherheits-Check: Nur rechnen, wenn auch wirklich eine Startposition gesetzt wurde
+			if touch_start_pos != Vector2.ZERO:
+				var swipe_vector = event.position - touch_start_pos
+				
+				# Nur reagieren, wenn die Bewegung weit genug war
+				if swipe_vector.length() > min_swipe_distance:
+					analyze_swipe(swipe_vector)
+				
+				# Startposition wieder zurücksetzen, um Geister-Swipes zu verhindern
+				touch_start_pos = Vector2.ZERO
 
 # Hilfsfunktion, um den Winkel des Swipes in eine Richtung zu übersetzen
 func analyze_swipe(swipe: Vector2):
