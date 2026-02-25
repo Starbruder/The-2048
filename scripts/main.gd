@@ -3,12 +3,13 @@ extends Node2D
 var tile_scene = preload("res://scenes/tile.tscn")
 
 # --- Einstellungen ---
+@export var is_hexagon_mode: bool = false # HIER kannst du nun im Editor umschalten!
 var new_tile_value = 2.0
 var grid_size = 4
 var padding = 10
 var margin = 40
 var use_animations = true
-var corner_radius = 10 # 0 = eckig
+var corner_radius = 0 # 0 = eckig (aktuell für Quadrate relevant)
 
 # --- Variablen ---
 var cell_size: float
@@ -34,38 +35,72 @@ func _ready():
 	spawn_tile()
 	spawn_tile()
 
+# GEÄNDERT: Gibt jetzt exakt das ZENTRUM der Zelle zurück
 func get_tile_pos(x: int, y: int) -> Vector2:
-	return Vector2(x * (cell_size + padding) + margin, y * (cell_size + padding) + 300)
+	var top_left_x = x * (cell_size + padding) + margin
+	var top_left_y = y * (cell_size + padding) + 300
+	return Vector2(top_left_x + cell_size / 2.0, top_left_y + cell_size / 2.0)
 	
 func setup_background_grid():
 	# 1. Das große Haupt-Spielfeld
-	var board_bg = Panel.new() # Panel statt ColorRect
+	var board_width = grid_size * (cell_size + padding) + padding
+	# Zentrum des gesamten Boards berechnen
+	var center_x = (margin - padding) + board_width / 2.0
+	var center_y = (300 - padding) + board_width / 2.0
 	
-	var style_bg = StyleBoxFlat.new()
-	style_bg.bg_color = Color("908474")
-	style_bg.set_corner_radius_all(corner_radius)
-	board_bg.add_theme_stylebox_override("panel", style_bg)
-	
-	var board_size = grid_size * (cell_size + padding) + padding
-	board_bg.size = Vector2(board_size, board_size)
-	board_bg.position = Vector2(margin - padding, 300 - padding)
+	# Das Board bekommt einen minimal größeren Radius, damit es das Padding umschließt
+	var board_bg = create_background_poly(Vector2(center_x, center_y), board_width / 2.0, Color("908474"), corner_radius + 5)
 	board_bg.z_index = -2
 	add_child(board_bg)
 	
 	# 2. Die leeren Felder (Slots)
 	for x in range(grid_size):
 		for y in range(grid_size):
-			var empty_slot = Panel.new() # Panel statt ColorRect
-			
-			var style_slot = StyleBoxFlat.new()
-			style_slot.bg_color = Color("ded5d0")
-			#style_slot.set_corner_radius_all(corner_radius)
-			empty_slot.add_theme_stylebox_override("panel", style_slot)
-			
-			empty_slot.size = Vector2(cell_size, cell_size)
-			empty_slot.position = get_tile_pos(x, y)
+			var slot_pos = get_tile_pos(x, y)
+			var empty_slot = create_background_poly(slot_pos, cell_size / 2.0, Color("ded5d0"), corner_radius)
 			empty_slot.z_index = -1
 			add_child(empty_slot)
+
+func create_background_poly(pos: Vector2, size_factor: float, color: Color, radius: float) -> Polygon2D:
+	var poly = Polygon2D.new()
+	var points = PackedVector2Array()
+	var s = size_factor
+	var r = clamp(radius, 0.0, s) # Verhindern, dass der Radius größer als das Feld wird
+	var corner_points = 6 # Detailgrad der Rundung (je höher, desto runder)
+	
+	if not is_hexagon_mode:
+		# Abgerundetes Quadrat
+		# Oben Rechts
+		for i in range(corner_points + 1):
+			var angle = deg_to_rad(270 + 90.0 * i / corner_points)
+			points.append(Vector2(s - r + r * cos(angle), -s + r + r * sin(angle)))
+		# Unten Rechts
+		for i in range(corner_points + 1):
+			var angle = deg_to_rad(0 + 90.0 * i / corner_points)
+			points.append(Vector2(s - r + r * cos(angle), s - r + r * sin(angle)))
+		# Unten Links
+		for i in range(corner_points + 1):
+			var angle = deg_to_rad(90 + 90.0 * i / corner_points)
+			points.append(Vector2(-s + r + r * cos(angle), s - r + r * sin(angle)))
+		# Oben Links
+		for i in range(corner_points + 1):
+			var angle = deg_to_rad(180 + 90.0 * i / corner_points)
+			points.append(Vector2(-s + r + r * cos(angle), -s + r + r * sin(angle)))
+	else:
+		# Abgerundetes Hexagon
+		for i in range(6):
+			var center_angle = deg_to_rad(60 * i - 30)
+			var arc_center = Vector2((s - r) * cos(center_angle), (s - r) * sin(center_angle))
+			var start_angle = center_angle - deg_to_rad(30)
+			
+			for j in range(corner_points + 1):
+				var angle = start_angle + deg_to_rad(60.0 * j / corner_points)
+				points.append(arc_center + Vector2(r * cos(angle), r * sin(angle)))
+			
+	poly.polygon = points
+	poly.color = color
+	poly.position = pos
+	return poly
 
 func spawn_tile():
 	var empty_cells = []
@@ -81,6 +116,7 @@ func spawn_tile():
 		
 		var new_tile = tile_scene.instantiate()
 		new_tile.value = new_tile_value
+		new_tile.is_hexagon = is_hexagon_mode # NEU: Gibt dem Tile den Modus weiter
 		var target_scale = Vector2(cell_size / 160.0, cell_size / 160.0)
 		new_tile.position = get_tile_pos(x, y)
 		add_child(new_tile)
@@ -107,44 +143,27 @@ func _input(event):
 		move_all_tiles(direction)
 		return
 
-	# 2. Touch & Maus-Swipe Logik (Gefixed!)
-	# Wir prüfen, ob es ein Touch ist ODER explizit die LINKE Maustaste
+	# 2. Touch & Maus-Swipe Logik
 	var is_valid_swipe = (event is InputEventScreenTouch) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT)
 	
 	if is_valid_swipe:
 		if event.pressed:
-			# Finger/Maus wurde gerade aufgesetzt
 			touch_start_pos = event.position
 		else:
-			# Finger/Maus wurde losgelassen -> Differenz berechnen
-			# Sicherheits-Check: Nur rechnen, wenn auch wirklich eine Startposition gesetzt wurde
 			if touch_start_pos != Vector2.ZERO:
 				var swipe_vector = event.position - touch_start_pos
-				
-				# Nur reagieren, wenn die Bewegung weit genug war
 				if swipe_vector.length() > min_swipe_distance:
 					analyze_swipe(swipe_vector)
-				
-				# Startposition wieder zurücksetzen, um Geister-Swipes zu verhindern
 				touch_start_pos = Vector2.ZERO
 
-# Hilfsfunktion, um den Winkel des Swipes in eine Richtung zu übersetzen
 func analyze_swipe(swipe: Vector2):
 	var swipe_direction = Vector2.ZERO
-	
-	# Wir prüfen, ob die Bewegung eher horizontal oder vertikal war
 	if abs(swipe.x) > abs(swipe.y):
-		# Horizontal
-		if swipe.x > 0:
-			swipe_direction = Vector2.RIGHT
-		else:
-			swipe_direction = Vector2.LEFT
+		if swipe.x > 0: swipe_direction = Vector2.RIGHT
+		else: swipe_direction = Vector2.LEFT
 	else:
-		# Vertikal
-		if swipe.y > 0:
-			swipe_direction = Vector2.DOWN
-		else:
-			swipe_direction = Vector2.UP
+		if swipe.y > 0: swipe_direction = Vector2.DOWN
+		else: swipe_direction = Vector2.UP
 			
 	if swipe_direction != Vector2.ZERO:
 		move_all_tiles(swipe_direction)
@@ -175,7 +194,6 @@ func move_all_tiles(direction: Vector2):
 			is_moving = true
 			active_tweens.back().finished.connect(_on_move_finished)
 		else:
-			# Sofort spawnen im Turbo-Modus
 			spawn_tile()
 	else:
 		is_moving = false
@@ -232,6 +250,6 @@ func shift_tile(tile, x, y, direction):
 			else:
 				tile.queue_free()
 				target_tile.update_display()
-				return true # Signaliert Erfolg ohne Tween
+				return true
 				
 	return movement_tween if use_animations else has_shifted

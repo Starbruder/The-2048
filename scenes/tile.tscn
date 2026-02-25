@@ -5,14 +5,14 @@
 [node name="Tile" type="Node2D" unique_id=1291646881]
 script = ExtResource("1_3dk36")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=1198452553]
-offset_right = 160.0
-offset_bottom = 160.0
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=1714459234]
 
 [node name="Label" type="Label" parent="." unique_id=1465209028]
 modulate = Color(0, 0, 0, 1)
-offset_right = 160.0
-offset_bottom = 160.0
+offset_left = -79.0
+offset_top = -79.0
+offset_right = 81.0
+offset_bottom = 81.0
 text = "2"
 horizontal_alignment = 1
 vertical_alignment = 1
