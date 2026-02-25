@@ -8,6 +8,15 @@ var tap_count = 0
 var last_tap_time = 0.0
 var tap_start_pos = Vector2.ZERO # Merkt sich, wo der Klick startete
 
+func _ready():
+	# WICHTIG: Verhindert, dass die App beim Zurück-Button schließt
+	get_tree().set_quit_on_go_back(false)
+	
+# Diese Funktion fängt System-Events ab (wie den Android Back-Button)
+func _notification(what):
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		trigger_reset("Android Zurück-Taste (System)")
+
 func _input(event):
 	# 1. PC: ESC-Taste oder Mittlere Maustaste
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
@@ -16,11 +25,7 @@ func _input(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_MIDDLE:
 		trigger_reset("PC (Mittlere Maustaste)")
 
-	# 2. ANDROID: Zurück-Taste
-	if event.is_action_pressed("ui_cancel"):
-		trigger_reset("Android Zurück-Taste")
-
-	# 3. HANDY & PC: Triple-Tap (Nur wenn fast stillstehend)
+	# 2. HANDY & PC: Triple-Tap (Nur wenn fast stillstehend)
 	var is_tap_action = (event is InputEventScreenTouch) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT)
 	
 	if is_tap_action:
