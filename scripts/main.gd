@@ -203,13 +203,16 @@ func shift_tile(tile, current_coords: Vector2i, direction: Vector2i):
 		next = curr + direction
 		has_shifted = true
 
-	var move_tween = null
+	# Wir nennen es move_result statt move_tween, weil es jetzt auch ein boolean sein kann
+	var move_result = null 
+	
 	if has_shifted:
 		if use_animations:
-			move_tween = create_tween()
-			move_tween.tween_property(tile, "position", get_tile_pos(curr), 0.1).set_trans(Tween.TRANS_SINE)
+			move_result = create_tween()
+			move_result.tween_property(tile, "position", get_tile_pos(curr), 0.1).set_trans(Tween.TRANS_SINE)
 		else:
 			tile.position = get_tile_pos(curr)
+			move_result = true # WICHTIG: Das sagt dem Spiel "Hey, ich habe mich bewegt!"
 
 	if grid.has(next):
 		var target_tile = grid[next]
@@ -235,7 +238,7 @@ func shift_tile(tile, current_coords: Vector2i, direction: Vector2i):
 				target_tile.update_display()
 				return true
 				
-	return move_tween
+	return move_result
 
 # --- Input-Handling ---
 
