@@ -5,7 +5,7 @@ var tile_scene = preload("res://scenes/tile.tscn")
 # --- Einstellungen ---
 @export var is_hexagon_mode: bool = false
 var new_tile_value = 2.0
-var grid_size = 4
+var side_length = 4 # Steuert die Seitenlänge
 var padding = 10
 var margin = 40
 var use_animations = true
@@ -22,9 +22,17 @@ var min_swipe_distance = 50
 
 func _ready():
 	screen_width = ProjectSettings.get_setting("display/window/size/viewport_width")
-	var total_paddings = padding * (grid_size - 1)
-	var available_space = screen_width - (margin * 2) - total_paddings
-	cell_size = available_space / grid_size
+	
+	if not is_hexagon_mode:
+		var total_paddings = padding * (side_length - 1)
+		var available_space = screen_width - (margin * 2) - total_paddings
+		cell_size = available_space / side_length
+	else:
+		var r_limit = side_length - 1
+		var available_space = screen_width - (margin * 2)
+		# Berechnet den nötigen Radius (cell_size) damit das Hex-Grid exakt auf den Screen passt
+		var s = available_space / ((2 * r_limit + 1) * sqrt(3))
+		cell_size = s - (padding / 4.0) 
 	
 	initialize_grid()
 	setup_background_grid()
@@ -34,11 +42,11 @@ func _ready():
 func initialize_grid():
 	grid.clear()
 	if not is_hexagon_mode:
-		for x in range(grid_size):
-			for y in range(grid_size):
+		for x in range(side_length):
+			for y in range(side_length):
 				grid[Vector2i(x, y)] = null
 	else:
-		var r_limit = 2 
+		var r_limit = side_length - 1 
 		for q in range(-r_limit, r_limit + 1):
 			var r1 = max(-r_limit, -q - r_limit)
 			var r2 = min(r_limit, -q + r_limit)
@@ -51,41 +59,51 @@ func get_tile_pos(coords: Vector2i) -> Vector2:
 		var top_left_y = coords.y * (cell_size + padding) + 300
 		return Vector2(top_left_x + cell_size / 2.0, top_left_y + cell_size / 2.0)
 	else:
-		var size = cell_size / 1.7
-		var x = size * (sqrt(3) * coords.x + sqrt(3)/2.0 * coords.y)
-		var y = size * (3.0/2.0 * coords.y)
+		var s = cell_size + (padding / 2.0) # Minimaler Offset für die Lücken
+		var x = s * (sqrt(3) * coords.x + sqrt(3)/2.0 * coords.y)
+		var y = s * (3.0/2.0 * coords.y)
 		return (get_viewport_rect().size / 2.0) + Vector2(x, y)
 
 func setup_background_grid():
 	var board_color = Color("908474")
 	if not is_hexagon_mode:
-		var board_width = grid_size * (cell_size + padding) + padding
+		var board_width = side_length * (cell_size + padding) + padding
 		var center = Vector2(margin - padding + board_width/2.0, 300 - padding + board_width/2.0)
-		var board_bg = create_background_poly(center, board_width/2.0, board_color, 5) # Kleiner Bonus-Radius für das Board-Außenmaß
+		var board_bg = create_background_poly(center, board_width/2.0, board_color, corner_radius + 5)
 		board_bg.z_index = -2
 		add_child(board_bg)
 	else:
-		var board_radius = cell_size * 2.2 
-		var board_bg = create_background_poly(get_viewport_rect().size / 2.0, board_radius, board_color, 0)
+		var r_limit = side_length - 1
+		var s = cell_size + (padding / 2.0)
+		# Berechnet die Höhe bis zur Kante des obersten Hexagons
+		var distance_to_top = (s * 1.5 * r_limit) + cell_size + padding
+		# Daraus errechnet sich der Umkreis-Radius für das flache Hintergrund-Board
+		var board_radius = distance_to_top * 2.0 / sqrt(3.0) 
+		
+		# is_flat_topped = true -> Zeichnet das Board passgenau
+		var board_bg = create_background_poly(get_viewport_rect().size / 2.0, board_radius, board_color, corner_radius * 2, true)
 		board_bg.z_index = -2
 		add_child(board_bg)
 
 	for coords in grid.keys():
 		var slot_pos = get_tile_pos(coords)
-		var empty_slot = create_background_poly(slot_pos, cell_size / 2.0, Color("ded5d0"), corner_radius)
+		var radius_param = cell_size / 2.0 if not is_hexagon_mode else cell_size
+		var empty_slot = create_background_poly(slot_pos, radius_param, Color("ded5d0"), corner_radius)
 		empty_slot.z_index = -1
 		add_child(empty_slot)
 
-func create_background_poly(pos: Vector2, s: float, color: Color, r: float) -> Polygon2D:
+# Die Zeichen-Logik kann jetzt abgerundete Hexagone zeichnen (kopiert aus deiner tile.gd)
+func create_background_poly(pos: Vector2, s: float, color: Color, r: float, is_flat_topped: bool = false) -> Polygon2D:
 	var poly = Polygon2D.new()
 	var points = PackedVector2Array()
-	
+	var corner_points = 6
+	r = clamp(r, 0.0, s)
+
 	if not is_hexagon_mode:
-		# Einfaches Rechteck, wenn r=0
+		# Rechteck
 		if r <= 0:
 			points = [Vector2(-s, -s), Vector2(s, -s), Vector2(s, s), Vector2(-s, s)]
 		else:
-			var corner_points = 10
 			var angles = [270, 0, 90, 180]
 			var centers = [Vector2(s-r, -s+r), Vector2(s-r, s-r), Vector2(-s+r, s-r), Vector2(-s+r, -s+r)]
 			for i in range(4):
@@ -93,15 +111,29 @@ func create_background_poly(pos: Vector2, s: float, color: Color, r: float) -> P
 					var angle = deg_to_rad(angles[i] + 90.0 * j / corner_points)
 					points.append(centers[i] + Vector2(r * cos(angle), r * sin(angle)))
 	else:
-		# Hexagon
-		for i in range(6):
-			var angle = deg_to_rad(60 * i - 90)
-			points.append(Vector2(s * cos(angle), s * sin(angle)))
+		# Hexagon (pointy-topped für Tiles, flat-topped für das Board)
+		var angle_offset = 0 if is_flat_topped else -30
+		if r <= 0:
+			for i in range(6):
+				var angle = deg_to_rad(60 * i + angle_offset)
+				points.append(Vector2(s * cos(angle), s * sin(angle)))
+		else:
+			for i in range(6):
+				var center_angle = deg_to_rad(60 * i + angle_offset)
+				var arc_center = Vector2((s - r) * cos(center_angle), (s - r) * sin(center_angle))
+				var start_angle = center_angle - deg_to_rad(30)
+				for j in range(corner_points + 1):
+					var angle = start_angle + deg_to_rad(60.0 * j / corner_points)
+					points.append(arc_center + Vector2(r * cos(angle), r * sin(angle)))
 				
 	poly.polygon = points
 	poly.color = color
 	poly.position = pos
 	return poly
+
+func get_target_scale() -> Vector2:
+	if is_hexagon_mode: return Vector2(cell_size / 80.0, cell_size / 80.0)
+	else: return Vector2(cell_size / 160.0, cell_size / 160.0)
 
 func spawn_tile():
 	var empty_cells = []
@@ -116,14 +148,13 @@ func spawn_tile():
 		new_tile.is_hexagon = is_hexagon_mode
 		new_tile.corner_radius = corner_radius
 		
-		var target_scale = Vector2(cell_size / 160.0, cell_size / 160.0)
+		var target_scale = get_target_scale()
 		new_tile.position = get_tile_pos(random_coords)
 		new_tile.scale = Vector2.ZERO # Start bei 0
 		add_child(new_tile)
 		grid[random_coords] = new_tile
 		
 		if use_animations:
-			# TRANS_QUAD verhindert das "Hüpfen" (kein Overshoot wie bei TRANS_BACK)
 			create_tween().tween_property(new_tile, "scale", target_scale, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		else:
 			new_tile.scale = target_scale
@@ -135,7 +166,6 @@ func move_all_tiles(direction: Vector2i):
 	
 	var sorted_coords = grid.keys()
 	sorted_coords.sort_custom(func(a, b):
-		# Wir sortieren nach der Projektion auf die Bewegungsrichtung
 		var dir_v = Vector2(direction)
 		return Vector2(a).dot(dir_v) > Vector2(b).dot(dir_v)
 	)
@@ -153,7 +183,6 @@ func move_all_tiles(direction: Vector2i):
 	if moved:
 		is_moving = true
 		if use_animations and active_tweens.size() > 0:
-			# Wir warten auf den letzten Tween
 			active_tweens.back().finished.connect(func(): 
 				is_moving = false
 				spawn_tile()
@@ -195,10 +224,9 @@ func shift_tile(tile, current_coords: Vector2i, direction: Vector2i):
 				m_tween.tween_callback(tile.queue_free)
 				m_tween.parallel().tween_callback(target_tile.update_display)
 				
-				# Der Bounce-Effekt passiert nur HIER beim Verschmelzen
 				var bounce = create_tween()
 				bounce.tween_interval(0.05)
-				var s = Vector2(cell_size / 160.0, cell_size / 160.0)
+				var s = get_target_scale()
 				bounce.tween_property(target_tile, "scale", s * 1.15, 0.05)
 				bounce.tween_property(target_tile, "scale", s, 0.05)
 				return m_tween
@@ -209,7 +237,7 @@ func shift_tile(tile, current_coords: Vector2i, direction: Vector2i):
 				
 	return move_tween
 
-# --- Input-Handling (Swipe & Keys) ---
+# --- Input-Handling ---
 
 func _input(event):
 	if is_moving: return
