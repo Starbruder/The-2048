@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://0uv4c4xud8qv"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glo18"]
+content_margin_left = 15.0
+content_margin_top = 15.0
+content_margin_right = 15.0
+content_margin_bottom = 15.0
+bg_color = Color(0.73333335, 0.6784314, 0.627451, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[node name="Control" type="Control" unique_id=880604273]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="MarginContainer" type="Container" parent="." unique_id=1643310742]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TopRow" type="HBoxContainer" parent="MarginContainer" unique_id=509145832]
+layout_mode = 2
+
+[node name="ScoreBubble" type="PanelContainer" parent="MarginContainer" unique_id=1364362331]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glo18")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/ScoreBubble" unique_id=1360502935]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Score" type="VBoxContainer" parent="MarginContainer/ScoreBubble/HBoxContainer" unique_id=461088994]
+layout_mode = 2
+alignment = 1
+
+[node name="ScoreTitle" type="Label" parent="MarginContainer/ScoreBubble/HBoxContainer/Score" unique_id=1988983201]
+layout_mode = 2
+
+[node name="ScoreValue" type="Label" parent="MarginContainer/ScoreBubble/HBoxContainer/Score" unique_id=946959870]
+layout_mode = 2
+
+[node name="Highscore" type="VBoxContainer" parent="MarginContainer/ScoreBubble/HBoxContainer" unique_id=1474406094]
+layout_mode = 2
+alignment = 1
+
+[node name="HighScoreTitle" type="Label" parent="MarginContainer/ScoreBubble/HBoxContainer/Highscore" unique_id=892642462]
+layout_mode = 2
+
+[node name="HighScoreValue" type="Label" parent="MarginContainer/ScoreBubble/HBoxContainer/Highscore" unique_id=776810433]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="MarginContainer" unique_id=2042337596]
+layout_mode = 2
+
+[node name="RightColumn" type="VBoxContainer" parent="MarginContainer" unique_id=67001754]
+layout_mode = 2
