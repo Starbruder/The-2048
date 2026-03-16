@@ -4,12 +4,12 @@ var tile_scene = preload("res://scenes/tile.tscn")
 
 # --- Einstellungen ---
 @export var is_hexagon_mode: bool = false
-var new_tile_value = 2.0
-var side_length = 4 # Steuert die Seitenlänge
-var padding = 10
-var margin = 40
-var use_animations = true
-var corner_radius = 0 # 0 für eckige Tiles
+var new_tile_value: int = 2
+var side_length: int = 4 # Steuert die Seitenlänge
+var padding: int = 10
+var margin: int = 40
+var use_animations: bool = true
+var corner_radius: int = 0 # 0 für eckige Tiles
 
 # --- Variablen ---
 var cell_size: float
