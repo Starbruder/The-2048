@@ -1,8 +1,8 @@
 extends Node2D
 
-var value: float = 2
+var value: int = 2
 var is_hexagon: bool = false 
-var corner_radius: float = 0.0 # Wird von main.gd beim Spawnen gesetzt
+var corner_radius: int = 0 # Wird von main.gd beim Spawnen gesetzt
 
 func _ready() -> void:
 	update_display()
@@ -74,7 +74,7 @@ func update_appearance() -> void:
 func _update_polygon_shape(poly: Polygon2D):
 	var points = PackedVector2Array()
 	var s = 80 
-	var r = clamp(corner_radius, 0.0, s)
+	var r = clamp(corner_radius, 0, s)
 	var corner_points = 6 
 
 	if not is_hexagon:
