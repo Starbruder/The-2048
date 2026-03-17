@@ -14,6 +14,8 @@ corner_radius_bottom_right = 15
 corner_radius_bottom_left = 15
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_auudt"]
+content_margin_left = 20.0
+content_margin_right = 20.0
 bg_color = Color(0.5372549, 0.48235294, 0.43137255, 1)
 corner_radius_top_left = 15
 corner_radius_top_right = 15
@@ -31,6 +33,8 @@ func update_score_display(new_score: int):
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w5fhf"]
+content_margin_left = 20.0
+content_margin_right = 20.0
 bg_color = Color(0.5372549, 0.48235294, 0.43137255, 1)
 corner_radius_top_left = 15
 corner_radius_top_right = 15
@@ -60,7 +64,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_glo18")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="TopRow/ScoreBubble" unique_id=1360502935]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 15
 
 [node name="ScoreDesign" type="PanelContainer" parent="TopRow/ScoreBubble/HBoxContainer" unique_id=208777899]
 layout_mode = 2
@@ -73,6 +77,8 @@ alignment = 1
 [node name="ScoreTitle" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=1988983201]
 layout_mode = 2
 text = "SCORE"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ScoreValue" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=946959870]
 layout_mode = 2
@@ -91,6 +97,8 @@ alignment = 1
 [node name="HighScoreTitle" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=892642462]
 layout_mode = 2
 text = "HIGHSCORE"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HighScoreValue" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=776810433]
 layout_mode = 2
