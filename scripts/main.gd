@@ -20,9 +20,21 @@ var is_moving = false
 var touch_start_pos = Vector2.ZERO
 var min_swipe_distance = 50
 
+# Fürs umschalten von Rect zu Hex und vice versa
+@onready var square_mode_btn = $Control/TopRow/RightColumn/HBoxContainer/VBoxContainer/CheckButton
+
 func _ready():
 	screen_width = ProjectSettings.get_setting("display/window/size/viewport_width")
 	
+	# Hier legen wir die Leitung manuell vom Checkbutton fürs umschalten der Gamemodes:
+	if square_mode_btn:
+		square_mode_btn.toggled.connect(_on_square_mode_toggled)
+	
+	# Board zum ersten Mal aufbauen
+	setup_board()
+
+func setup_board():
+	# 1. Die Mathe-Berechnung für die Zellengröße (aus deinem alten _ready kopiert)
 	if not is_hexagon_mode:
 		var total_paddings = padding * (side_length - 1)
 		var available_space = screen_width - (margin * 2) - total_paddings
@@ -32,12 +44,35 @@ func _ready():
 		var available_space = screen_width - (margin * 2)
 		# Berechnet den nötigen Radius (cell_size) damit das Hex-Grid exakt auf den Screen passt
 		var s = available_space / ((2 * r_limit + 1) * sqrt(3))
-		cell_size = s - (padding / 4.0) 
-	
+		cell_size = s - (padding / 4.0)
+		
+	# 2. Das Spielfeld zeichnen und befüllen
 	initialize_grid()
 	setup_background_grid()
 	spawn_tile()
 	spawn_tile()
+
+func _on_square_mode_toggled(is_on: bool):
+	# is_on ist true, wenn der Square-Mode-Schalter an ist
+	is_hexagon_mode = !is_on
+	print("Modus gewechselt! Hex-Mode ist jetzt: ", is_hexagon_mode)
+	
+	# --- DER SOFT RESET ---
+	
+	# 1. Alte Grafiken vom Bildschirm löschen (Hintergründe und Tiles)
+	# WICHTIG: Wir dürfen das UI nicht löschen! Deshalb filtern wir:
+	for child in get_children():
+		if child is Polygon2D or child.has_method("update_display"): 
+			# Polygon2D = Hintergrund. update_display() = Eigenschaft deiner Tiles
+			child.queue_free()
+			
+	# 2. Alte Spieldaten aus dem Speicher löschen
+	grid.clear()
+	merged_tiles.clear()
+	is_moving = false
+	
+	# 3. Spielbrett mit dem neuen Modus frisch aufbauen
+	setup_board()
 
 func initialize_grid():
 	grid.clear()
