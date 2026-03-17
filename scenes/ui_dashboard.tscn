@@ -66,9 +66,10 @@ alignment = 1
 
 [node name="ScoreTitle" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=1988983201]
 layout_mode = 2
-text = "SCORE"
+text = "Score"
 horizontal_alignment = 1
 vertical_alignment = 1
+uppercase = true
 
 [node name="ScoreValue" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=946959870]
 layout_mode = 2
@@ -85,9 +86,10 @@ alignment = 1
 
 [node name="HighScoreTitle" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=892642462]
 layout_mode = 2
-text = "HIGHSCORE"
+text = "Highscore"
 horizontal_alignment = 1
 vertical_alignment = 1
+uppercase = true
 
 [node name="HighScoreValue" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=776810433]
 layout_mode = 2
@@ -116,7 +118,8 @@ flat = true
 [node name="Label" type="Label" parent="TopRow/RightColumn/HBoxContainer/VBoxContainer" unique_id=893718229]
 layout_mode = 2
 text = "Square Mode"
-horizontal_alignment = 2
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Button" type="Button" parent="TopRow/RightColumn/HBoxContainer" unique_id=1371121781]
 custom_minimum_size = Vector2(100, 100)
