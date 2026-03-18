@@ -21,7 +21,7 @@ var touch_start_pos = Vector2.ZERO
 var min_swipe_distance = 50
 
 # Fürs umschalten von Rect zu Hex und vice versa
-@onready var square_mode_btn = $Control/TopRow/RightColumn/HBoxContainer/VBoxContainer/CheckButton
+@onready var square_mode_btn = $CanvasLayer/Control/MarginContainer/TopRow/RightColumn/HBoxContainer/VBoxContainer/CheckButton
 
 func _ready():
 	screen_width = ProjectSettings.get_setting("display/window/size/viewport_width")

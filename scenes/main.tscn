@@ -14,4 +14,9 @@ script = ExtResource("2_0wfyh")
 [node name="ThemeManager" type="Node" parent="." unique_id=1802263424]
 script = ExtResource("3_sugp2")
 
-[node name="Control" parent="." unique_id=880604273 instance=ExtResource("4_jyhfs")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=197205422]
+
+[node name="Control" parent="CanvasLayer" unique_id=880604273 instance=ExtResource("4_jyhfs")]
+anchors_preset = 10
+anchor_bottom = 0.0
+grow_vertical = 1

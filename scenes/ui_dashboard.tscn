@@ -42,86 +42,95 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TopRow" type="HBoxContainer" parent="." unique_id=509145832]
-layout_mode = 0
-offset_right = 720.0
-offset_bottom = 127.0
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=968134196]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="TopRow" type="HBoxContainer" parent="MarginContainer" unique_id=509145832]
+layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ScoreBubble" type="PanelContainer" parent="TopRow" unique_id=1364362331]
+[node name="ScoreBubble" type="PanelContainer" parent="MarginContainer/TopRow" unique_id=1364362331]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_glo18")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TopRow/ScoreBubble" unique_id=1360502935]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/TopRow/ScoreBubble" unique_id=1360502935]
 layout_mode = 2
 theme_override_constants/separation = 15
 
-[node name="ScoreDesign" type="PanelContainer" parent="TopRow/ScoreBubble/HBoxContainer" unique_id=208777899]
+[node name="ScoreDesign" type="PanelContainer" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer" unique_id=208777899]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_auudt")
 
-[node name="Score" type="VBoxContainer" parent="TopRow/ScoreBubble/HBoxContainer/ScoreDesign" unique_id=461088994]
+[node name="Score" type="VBoxContainer" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer/ScoreDesign" unique_id=461088994]
 layout_mode = 2
 alignment = 1
 
-[node name="ScoreTitle" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=1988983201]
+[node name="ScoreTitle" type="Label" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=1988983201]
 layout_mode = 2
 text = "Score"
 horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="ScoreValue" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=946959870]
+[node name="ScoreValue" type="Label" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer/ScoreDesign/Score" unique_id=946959870]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "2456"
 
-[node name="HighScoreDesign" type="PanelContainer" parent="TopRow/ScoreBubble/HBoxContainer" unique_id=585448958]
+[node name="HighScoreDesign" type="PanelContainer" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer" unique_id=585448958]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_w5fhf")
 
-[node name="Highscore" type="VBoxContainer" parent="TopRow/ScoreBubble/HBoxContainer/HighScoreDesign" unique_id=1474406094]
+[node name="Highscore" type="VBoxContainer" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer/HighScoreDesign" unique_id=1474406094]
 layout_mode = 2
 alignment = 1
 
-[node name="HighScoreTitle" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=892642462]
+[node name="HighScoreTitle" type="Label" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=892642462]
 layout_mode = 2
 text = "Highscore"
 horizontal_alignment = 1
 vertical_alignment = 1
 uppercase = true
 
-[node name="HighScoreValue" type="Label" parent="TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=776810433]
+[node name="HighScoreValue" type="Label" parent="MarginContainer/TopRow/ScoreBubble/HBoxContainer/HighScoreDesign/Highscore" unique_id=776810433]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "12345"
 
-[node name="Spacer" type="Control" parent="TopRow" unique_id=2042337596]
+[node name="Spacer" type="Control" parent="MarginContainer/TopRow" unique_id=2042337596]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RightColumn" type="VBoxContainer" parent="TopRow" unique_id=67001754]
+[node name="RightColumn" type="VBoxContainer" parent="MarginContainer/TopRow" unique_id=67001754]
 layout_mode = 2
 alignment = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TopRow/RightColumn" unique_id=1061557351]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/TopRow/RightColumn" unique_id=1061557351]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TopRow/RightColumn/HBoxContainer" unique_id=1119351297]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/TopRow/RightColumn/HBoxContainer" unique_id=1119351297]
 layout_mode = 2
 
-[node name="CheckButton" type="CheckButton" parent="TopRow/RightColumn/HBoxContainer/VBoxContainer" unique_id=1491341867]
+[node name="CheckButton" type="CheckButton" parent="MarginContainer/TopRow/RightColumn/HBoxContainer/VBoxContainer" unique_id=1491341867]
 layout_mode = 2
 button_pressed = true
 flat = true
 
-[node name="Label" type="Label" parent="TopRow/RightColumn/HBoxContainer/VBoxContainer" unique_id=893718229]
+[node name="Label" type="Label" parent="MarginContainer/TopRow/RightColumn/HBoxContainer/VBoxContainer" unique_id=893718229]
 layout_mode = 2
 text = "Square Mode"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Button" type="Button" parent="TopRow/RightColumn/HBoxContainer" unique_id=1371121781]
+[node name="Button" type="Button" parent="MarginContainer/TopRow/RightColumn/HBoxContainer" unique_id=1371121781]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxTexture_w5fhf")
