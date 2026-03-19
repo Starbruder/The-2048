@@ -56,11 +56,13 @@ func _input(event):
 
 func trigger_reset(reason: String):
 	print("Reset ausgelöst durch: ", reason)
-	if is_inside_tree():
-		var tree = get_tree()
-		if tree != null:
-			tree.reload_current_scene()
+	
+	# Wir suchen die Main-Node. Da ResetController ein Child von Main ist:
+	var main_node = get_parent()
+	
+	if main_node.has_method("reset_game"):
+		main_node.reset_game()
 	else:
-		var main_tree = Engine.get_main_loop() as SceneTree
-		if main_tree:
-			main_tree.reload_current_scene()
+		# Sicherheits-Fallback, falls die Struktur mal anders ist
+		print("Fehler: main.gd nicht gefunden, lade Szene doch hart neu...")
+		get_tree().reload_current_scene()

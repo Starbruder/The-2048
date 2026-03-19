@@ -26,12 +26,33 @@ var min_swipe_distance = 50
 func _ready():
 	screen_width = ProjectSettings.get_setting("display/window/size/viewport_width")
 	
-	# Hier legen wir die Leitung manuell vom Checkbutton fürs umschalten der Gamemodes:
 	if square_mode_btn:
 		square_mode_btn.toggled.connect(_on_square_mode_toggled)
+		# WICHTIG: Beim Start den Modus an den Button anpassen!
+		is_hexagon_mode = !square_mode_btn.button_pressed
 	
-	# Board zum ersten Mal aufbauen
 	setup_board()
+
+# Diese neue Funktion nutzen wir für den Reset-Controller
+func reset_game():
+	print("Soft Reset wird ausgeführt...")
+	# 1. Alte Grafiken löschen
+	for child in get_children():
+		if child is Polygon2D or child.has_method("update_display"): 
+			child.queue_free()
+			
+	# 2. Daten leeren
+	grid.clear()
+	merged_tiles.clear()
+	is_moving = false
+	
+	# 3. Neu aufbauen (is_hexagon_mode bleibt erhalten!)
+	setup_board()
+
+func _on_square_mode_toggled(is_on: bool):
+	is_hexagon_mode = !is_on
+	print("Modus gewechselt! Hex-Mode ist jetzt: ", is_hexagon_mode)
+	reset_game() # Wir nutzen einfach unsere neue Funktion
 
 func setup_board():
 	# 1. Die Mathe-Berechnung für die Zellengröße (aus deinem alten _ready kopiert)
@@ -51,28 +72,6 @@ func setup_board():
 	setup_background_grid()
 	spawn_tile()
 	spawn_tile()
-
-func _on_square_mode_toggled(is_on: bool):
-	# is_on ist true, wenn der Square-Mode-Schalter an ist
-	is_hexagon_mode = !is_on
-	print("Modus gewechselt! Hex-Mode ist jetzt: ", is_hexagon_mode)
-	
-	# --- DER SOFT RESET ---
-	
-	# 1. Alte Grafiken vom Bildschirm löschen (Hintergründe und Tiles)
-	# WICHTIG: Wir dürfen das UI nicht löschen! Deshalb filtern wir:
-	for child in get_children():
-		if child is Polygon2D or child.has_method("update_display"): 
-			# Polygon2D = Hintergrund. update_display() = Eigenschaft deiner Tiles
-			child.queue_free()
-			
-	# 2. Alte Spieldaten aus dem Speicher löschen
-	grid.clear()
-	merged_tiles.clear()
-	is_moving = false
-	
-	# 3. Spielbrett mit dem neuen Modus frisch aufbauen
-	setup_board()
 
 func initialize_grid():
 	grid.clear()
